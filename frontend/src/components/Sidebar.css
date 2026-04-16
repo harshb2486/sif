@@ -1,0 +1,81 @@
+/* Sidebar Styles */
+
+.sidebar {
+  background: #2c3e50;
+  color: white;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease;
+  width: 250px;
+  overflow-y: auto;
+  margin-top: 60px;
+  z-index: 99;
+}
+
+.sidebar.closed {
+  width: 60px;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 1rem;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #34495e;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background: #34495e;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.nav-item {
+  display: block;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: #ecf0f1;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: #34495e;
+  border-left-color: #667eea;
+}
+
+.nav-item.active {
+  background: #34495e;
+  border-left-color: #667eea;
+  font-weight: 600;
+}
+
+.sidebar.closed .nav-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .toggle-btn {
+    display: block;
+  }
+}

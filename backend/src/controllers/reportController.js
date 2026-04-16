@@ -1,0 +1,168 @@
+// Report Controller
+// Handles reporting and analytics
+
+const Order = require('../models/Order');
+const Commission = require('../models/Commission');
+const User = require('../models/User');
+
+/**
+ * Get commission report for company
+ * GET /reports/commission
+ */
+const getCommissionReport = async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+
+    const commissions = await Commission.getCommissionsByCompany(companyId);
+
+    // Calculate summary
+    const summary = {
+      totalCommissions: commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0),
+      totalRecords: commissions.length,
+      averageCommission: commissions.length > 0 
+        ? commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0) / commissions.length 
+        : 0
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Commission report retrieved successfully',
+      data: {
+        summary,
+        details: commissions
+      }
+    });
+  } catch (error) {
+    console.error('Get Commission Report Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error: ' + error.message
+    });
+  }
+};
+
+/**
+ * Get sales report for company
+ * GET /reports/sales
+ */
+const getSalesReport = async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+
+    const orders = await Order.getOrdersByCompany(companyId);
+
+    // Calculate summary
+    const summary = {
+      totalSales: orders.reduce((sum, o) => sum + parseFloat(o.amount), 0),
+      totalOrders: orders.length,
+      averageOrderValue: orders.length > 0 
+        ? orders.reduce((sum, o) => sum + parseFloat(o.amount), 0) / orders.length 
+        : 0
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sales report retrieved successfully',
+      data: {
+        summary,
+        details: orders
+      }
+    });
+  } catch (error) {
+    console.error('Get Sales Report Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error: ' + error.message
+    });
+  }
+};
+
+/**
+ * Get leaderboard for sales persons
+ * GET /reports/leaderboard
+ */
+const getLeaderboard = async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+    const limit = req.query.limit || 10;
+
+    const leaderboard = await Commission.getLeaderboard(companyId, parseInt(limit));
+
+    return res.status(200).json({
+      success: true,
+      message: 'Leaderboard retrieved successfully',
+      data: leaderboard
+    });
+  } catch (error) {
+    console.error('Get Leaderboard Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error: ' + error.message
+    });
+  }
+};
+
+/**
+ * Get dashboard statistics
+ * GET /reports/dashboard
+ */
+const getDashboardStats = async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+    const userId = req.user.id;
+
+    // Get all orders
+    const allOrders = await Order.getOrdersByCompany(companyId);
+    
+    // Get my orders if sales person
+    let myOrders = [];
+    if (req.user.role === 'sales') {
+      myOrders = await Order.getOrdersBySalesPerson(userId, companyId);
+    }
+
+    // Get commissions
+    const commissions = await Commission.getCommissionsByCompany(companyId);
+    
+    // Get my commissions if sales person
+    let myCommissions = [];
+    if (req.user.role === 'sales') {
+      myCommissions = await Commission.getCommissionsBySalesPerson(userId, companyId);
+    }
+
+    // Get verified sales persons count
+    const salesPersons = await User.getVerifiedSalesPersons(companyId);
+
+    const stats = {
+      totalSales: allOrders.reduce((sum, o) => sum + parseFloat(o.amount), 0),
+      totalOrders: allOrders.length,
+      totalCommissionsIssued: commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0),
+      verifiedSalesPersons: salesPersons.length
+    };
+
+    // Add personal stats if sales person
+    if (req.user.role === 'sales') {
+      stats.mySales = myOrders.reduce((sum, o) => sum + parseFloat(o.amount), 0);
+      stats.myOrders = myOrders.length;
+      stats.myCommissions = myCommissions.reduce((sum, c) => sum + parseFloat(c.amount), 0);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Dashboard statistics retrieved successfully',
+      data: stats
+    });
+  } catch (error) {
+    console.error('Get Dashboard Stats Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error: ' + error.message
+    });
+  }
+};
+
+module.exports = {
+  getCommissionReport,
+  getSalesReport,
+  getLeaderboard,
+  getDashboardStats
+};
