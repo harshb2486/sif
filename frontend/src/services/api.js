@@ -116,4 +116,20 @@ export const exportsAPI = {
   }
 };
 
+// CHAT API (Sales Assistant)
+export const chatAPI = {
+  sendMessage: (message, conversationId = null) => 
+    api.post('/chat/message', { message, conversationId }),
+  getConversations: (limit = 20) => 
+    api.get(`/chat/conversations?limit=${limit}`),
+  getConversation: (conversationId) => 
+    api.get(`/chat/conversations/${conversationId}`),
+  deleteConversation: (conversationId) => 
+    api.delete(`/chat/conversations/${conversationId}`),
+  searchConversations: (query) => 
+    api.get(`/chat/search?q=${encodeURIComponent(query)}`),
+  getChatStatus: () => 
+    api.get('/chat/status')
+};
+
 export default api;

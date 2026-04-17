@@ -11,3 +11,4 @@ export { CreateOrderPage } from './CreateOrderPage';
 export { MyOrdersPage } from './MyOrdersPage';
 export { MyCommissionsPage } from './MyCommissionsPage';
 export { WaitingApprovalPage } from './WaitingApprovalPage';
+export { default as ChatPage } from './ChatPage';

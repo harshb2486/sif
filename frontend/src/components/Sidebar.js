@@ -13,7 +13,8 @@ export const Sidebar = () => {
 
   const getMenuItems = () => {
     const common = [
-      { path: '/dashboard', label: '📊 Dashboard' }
+      { path: '/dashboard', label: '📊 Dashboard' },
+      { path: '/chat', label: '🤖 Sales Assistant' }
     ];
 
     if (user?.role === 'company_admin') {

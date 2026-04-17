@@ -5,7 +5,15 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
+const xss = require('xss-clean');
 require('dotenv').config();
+
+// Import utilities
+const logger = require('./utils/logger');
+const errorHandler = require('./middleware/errorHandler');
+const swaggerSpec = require('./config/swagger');
+const { authLimiter, readLimiter, writeLimiter, exportLimiter } = require('./config/rateLimits');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -15,6 +23,7 @@ const salesRoutes = require('./routes/salesRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 // Initialize express app
 const app = express();
@@ -22,26 +31,20 @@ const app = express();
 // Security Middleware
 app.use(helmet()); // Add security headers
 
-// Rate limiting
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests, please try again later'
-});
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit login attempts to 5 per 15 minutes
-  message: 'Too many login attempts, please try again later',
-  skip: (req) => req.method !== 'POST'
-});
-
-app.use(generalLimiter); // Apply general limiter to all routes
+// Rate limiting - apply specific limiters to route groups
+// Auth routes get stricter limits, read-only get looser limits
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(xss()); // Prevent XSS attacks
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path}`, { ip: req.ip });
+  next();
+});
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -52,35 +55,42 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Routes
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Field Sales API Documentation'
+}));
+
+// Routes with specific rate limiting
 app.use('/auth', authLimiter, authRoutes);
-app.use('/companies', companyRoutes);
-app.use('/products', productRoutes);
-app.use('/sales', salesRoutes);
-app.use('/reports', reportRoutes);
-app.use('/users', userRoutes);
-app.use('/exports', exportRoutes);
+app.use('/companies', writeLimiter, companyRoutes);
+app.use('/products', writeLimiter, productRoutes);
+app.use('/sales', writeLimiter, salesRoutes);
+app.use('/reports', readLimiter, reportRoutes);
+app.use('/users', readLimiter, userRoutes);
+app.use('/exports', exportLimiter, exportRoutes);
+app.use('/chat', readLimiter, chatRoutes);
 
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'Route not found',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Global Error:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Server error: ' + err.message
-  });
-});
+// Global error handler (must be last)
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
+  logger.info('Server started', {
+    port: PORT,
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
   console.log(`\n╔════════════════════════════════════════╗`);
   console.log(`║ Field Sales Management API Server      ║`);
   console.log(`║ Running on: http://localhost:${PORT}      ║`);
@@ -89,3 +99,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+

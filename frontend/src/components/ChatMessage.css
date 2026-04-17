@@ -1,0 +1,130 @@
+.message-row {
+  display: flex;
+  margin-bottom: 12px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-row.user {
+  justify-content: flex-end;
+}
+
+.message-row.assistant {
+  justify-content: flex-start;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 70%;
+}
+
+.message-avatar {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 50%;
+}
+
+.user-message .message-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  order: 2;
+}
+
+.message-content {
+  padding: 12px 16px;
+  border-radius: 12px;
+  word-wrap: break-word;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.user-message .message-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  order: 1;
+}
+
+.assistant-message .message-content {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.message-line {
+  margin: 6px 0;
+}
+
+.message-line:first-child {
+  margin-top: 0;
+}
+
+.message-line:last-child {
+  margin-bottom: 0;
+}
+
+.bullet {
+  display: block;
+  margin-left: 12px;
+}
+
+.message-content strong {
+  font-weight: 600;
+}
+
+.message-time {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+.user-message .message-time {
+  opacity: 0.8;
+}
+
+/* Links styling */
+.message-content a {
+  color: inherit;
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+.user-message .message-content a {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Code blocks in messages */
+.message-content code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message {
+    max-width: 85%;
+  }
+
+  .message-content {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+}
