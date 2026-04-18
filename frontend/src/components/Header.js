@@ -67,19 +67,24 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Center Section - Navigation Tabs */}
-        <nav className="header-nav" aria-label="Quick navigation">
-          <a href="/dashboard" className="header-nav-item active">
-            Dashboard
-          </a>
-          <a href="/reports" className="header-nav-item">
-            Reports
-          </a>
-          <a href="/chat" className="header-nav-item">
-            AI Assistant
-            <span className="header-nav-badge" aria-label="3 new messages">3</span>
-          </a>
-        </nav>
+         {/* Center Section - Navigation Tabs */}
+         <nav className="header-nav" aria-label="Quick navigation">
+           <a href="/dashboard" className="header-nav-item active">
+             Dashboard
+           </a>
+           {user?.role === 'company_admin' && (
+             <a href="/products" className="header-nav-item">
+               Products
+             </a>
+           )}
+           <a href="/reports" className="header-nav-item">
+             Reports
+           </a>
+           <a href="/chat" className="header-nav-item">
+             AI Assistant
+             <span className="header-nav-badge" aria-label="3 new messages">3</span>
+           </a>
+         </nav>
 
         {/* Right Section - User Menu & Actions */}
         <div className="header-right">

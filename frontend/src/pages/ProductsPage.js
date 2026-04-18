@@ -15,7 +15,9 @@ export const ProductsPage = () => {
     name: '',
     price: '',
     commissionType: 'fixed',
-    commissionValue: ''
+    commissionValue: '',
+    image: null,
+    imagePreview: ''
   });
 
   const fetchProducts = async () => {
@@ -35,19 +37,47 @@ export const ProductsPage = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    
+    if (name === 'image' && files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ 
+        ...prev, 
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingId) {
-        await productsAPI.update(editingId, formData);
-      } else {
-        await productsAPI.create(formData);
+      const formPayload = new FormData();
+      formPayload.append('name', formData.name);
+      formPayload.append('price', formData.price);
+      formPayload.append('commissionType', formData.commissionType);
+      formPayload.append('commissionValue', formData.commissionValue);
+      
+      if (formData.image) {
+        formPayload.append('image', formData.image);
       }
-      setFormData({ name: '', price: '', commissionType: 'fixed', commissionValue: '' });
+
+      if (editingId) {
+        await productsAPI.update(editingId, formPayload);
+      } else {
+        await productsAPI.create(formPayload);
+      }
+      
+      setFormData({ 
+        name: '', 
+        price: '', 
+        commissionType: 'fixed', 
+        commissionValue: '', 
+        image: null, 
+        imagePreview: '' 
+      });
       setEditingId(null);
       setShowForm(false);
       fetchProducts();
@@ -150,6 +180,24 @@ export const ProductsPage = () => {
                       step="0.01"
                       required
                     />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Product Image</label>
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleChange}
+                      className="file-input"
+                    />
+                    {formData.imagePreview && (
+                      <div className="image-preview">
+                        <img src={formData.imagePreview} alt="Product preview" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
