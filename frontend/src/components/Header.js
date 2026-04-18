@@ -77,6 +77,11 @@ export const Header = () => {
                Products
              </a>
            )}
+           {(user?.role === 'company_admin' || user?.role === 'sales') && (
+             <a href="/owner-sales-chat" className="header-nav-item">
+               Team Chat/Call
+             </a>
+           )}
            <a href="/reports" className="header-nav-item">
              Reports
            </a>

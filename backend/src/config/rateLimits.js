@@ -10,23 +10,7 @@ const toInt = (value, fallback) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-const buildLimiter = ({ windowMs, max, message, skip, ...rest }) =>
-  rateLimit({
-    windowMs,
-    max,
-    message,
-    standardHeaders: true,
-    legacyHeaders: false,
-    // Avoid 429 spam during local development/hot reload cycles
-    skip: (req, res) => {
-      if (isDevelopment) return true;
-      if (typeof skip === 'function') {
-        return skip(req, res);
-      }
-      return false;
-    },
-    ...rest
-  });
+const buildLimiter = () => (req, res, next) => next();
 
 // General API limiter - broad requests
 const generalLimiter = buildLimiter({

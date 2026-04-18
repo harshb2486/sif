@@ -18,7 +18,8 @@ import {
   MyOrdersPage,
   MyCommissionsPage,
   WaitingApprovalPage,
-  ChatPage
+  ChatPage,
+  OwnerSalesCommunicationPage
 } from './pages';
 import './App.css';
 
@@ -125,8 +126,17 @@ const AppContent = () => {
         <Route
           path="/chat"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole={["company_admin", "sales"]}>
               <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/owner-sales-chat"
+          element={
+            <ProtectedRoute requiredRole={["company_admin", "sales"]}>
+              <OwnerSalesCommunicationPage />
             </ProtectedRoute>
           }
         />

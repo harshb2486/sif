@@ -15,6 +15,12 @@ const FloatingChatBot = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef(null);
 
+  const canUseAssistant =
+    !!user &&
+    ['company_admin', 'sales'].includes(user.role) &&
+    (user.role !== 'sales' || !!user.is_verified) &&
+    !!(user.companyId || user.company_id);
+
   // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -22,10 +28,10 @@ const FloatingChatBot = () => {
 
   // Load last conversation when opened
   useEffect(() => {
-    if (isOpen && !currentConversation) {
+    if (canUseAssistant && isOpen && !currentConversation) {
       loadLastConversation();
     }
-  }, [isOpen]);
+  }, [isOpen, canUseAssistant, currentConversation]);
 
   const loadLastConversation = async () => {
     try {
@@ -88,7 +94,7 @@ const FloatingChatBot = () => {
     setError(null);
   };
 
-  if (!user) return null;
+  if (!canUseAssistant) return null;
 
   return (
     <div className="floating-chatbot">

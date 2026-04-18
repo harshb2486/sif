@@ -147,4 +147,14 @@ export const chatAPI = {
     api.get('/chat/status')
 };
 
+// OWNER-SALES REALTIME CHAT API
+export const ownerSalesChatAPI = {
+  getContacts: () => api.get('/owner-sales-chat/contacts'),
+  getConversations: () => api.get('/owner-sales-chat/conversations'),
+  getMessagesByContact: (contactUserId, limit = 100) =>
+    api.get(`/owner-sales-chat/conversations/${contactUserId}/messages?limit=${limit}`),
+  sendMessage: (contactUserId, content) =>
+    api.post('/owner-sales-chat/messages', { contactUserId, content })
+};
+
 export default api;

@@ -2,6 +2,7 @@
 // Main application entry point
 
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -24,6 +25,8 @@ const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const ownerSalesChatRoutes = require('./routes/ownerSalesChatRoutes');
+const { initSocket } = require('./services/socketService');
 
 // Initialize express app
 const app = express();
@@ -70,6 +73,7 @@ app.use('/reports', readLimiter, reportRoutes);
 app.use('/users', readLimiter, userRoutes);
 app.use('/exports', exportLimiter, exportRoutes);
 app.use('/chat', readLimiter, chatRoutes);
+app.use('/owner-sales-chat', writeLimiter, ownerSalesChatRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -86,7 +90,10 @@ app.use(errorHandler);
 // Start server
 const PORT = Number(process.env.PORT) || 5000;
 
-const server = app.listen(PORT, () => {
+const httpServer = http.createServer(app);
+initSocket(httpServer);
+
+const server = httpServer.listen(PORT, () => {
   logger.info('Server started', {
     port: PORT,
     environment: process.env.NODE_ENV,
@@ -123,5 +130,6 @@ server.on('error', (error) => {
 });
 
 module.exports = app;
+
 
 

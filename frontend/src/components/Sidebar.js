@@ -49,6 +49,7 @@ export const Sidebar = () => {
         ...common,
         { path: '/products', label: 'Products', icon: '📦' },
         { path: '/reports', label: 'Reports', icon: '📈' },
+        { path: '/owner-sales-chat', label: 'Team Chat/Call', icon: '📞' },
         { path: '/chat', label: 'AI Assistant', icon: '🤖' }
       ];
     }
@@ -69,6 +70,7 @@ export const Sidebar = () => {
           { path: '/create-order', label: 'Create Sale', icon: '➕' },
           { path: '/my-orders', label: 'My Orders', icon: '📋' },
           { path: '/my-commissions', label: 'Commissions', icon: '💰' },
+          { path: '/owner-sales-chat', label: 'Owner Chat/Call', icon: '📞' },
           { path: '/chat', label: 'AI Assistant', icon: '🤖' }
         ];
       } else {
