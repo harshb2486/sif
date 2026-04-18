@@ -36,15 +36,38 @@ const getProductsByCompany = async (companyId) => {
 };
 
 /**
+ * Get all products across all companies
+ */
+const getAllProducts = async () => {
+  const connection = await pool.getConnection();
+  try {
+    const [products] = await connection.execute(
+      `SELECT p.*, c.name as company_name
+       FROM products p
+       JOIN companies c ON p.company_id = c.id
+       ORDER BY p.created_at DESC`
+    );
+    return products;
+  } finally {
+    connection.release();
+  }
+};
+
+/**
  * Find product by ID
  */
 const findProductById = async (id, companyId) => {
   const connection = await pool.getConnection();
   try {
-    const [products] = await connection.execute(
-      'SELECT * FROM products WHERE id = ? AND company_id = ?',
-      [id, companyId]
-    );
+    let query = 'SELECT * FROM products WHERE id = ?';
+    const params = [id];
+
+    if (companyId) {
+      query += ' AND company_id = ?';
+      params.push(companyId);
+    }
+
+    const [products] = await connection.execute(query, params);
     return products[0] || null;
   } finally {
     connection.release();
@@ -121,6 +144,7 @@ const getProductsWithPagination = async (companyId, page = 1, limit = 10, search
 module.exports = {
   createProduct,
   getProductsByCompany,
+  getAllProducts,
   findProductById,
   updateProduct,
   deleteProduct,

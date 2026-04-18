@@ -1,4 +1,4 @@
-// Register Page
+// Register Page - Modern SaaS Design
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -6,13 +6,12 @@ import { authAPI } from '../services/api';
 import './Auth.css';
 
 export const RegisterPage = () => {
-  const [tab, setTab] = useState('company'); // company or sales
+  const [tab, setTab] = useState('company');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Company registration state
   const [companyForm, setCompanyForm] = useState({
     name: '',
     email: '',
@@ -22,7 +21,6 @@ export const RegisterPage = () => {
     companyEmail: ''
   });
 
-  // Sales person registration state
   const [salesForm, setSalesForm] = useState({
     name: '',
     email: '',
@@ -51,7 +49,6 @@ export const RegisterPage = () => {
       const response = await authAPI.registerCompany(companyForm);
       const { token, user } = response.data.data;
 
-      // Auto login
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
@@ -88,168 +85,324 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <h1>📊 Field Sales Management</h1>
-        <h2>Register</h2>
+    <div className="auth-page-container">
+      <div className="auth-card">
+        {/* Header */}
+        <div className="auth-header">
+          <div className="auth-logo-wrapper">
+            <div className="auth-logo" aria-hidden="true">
+              📊
+            </div>
+          </div>
+          <h1 className="auth-title">Create an Account</h1>
+          <p className="auth-subtitle">Join our Field Sales CRM platform</p>
+        </div>
 
-        <div className="tab-group">
+        {/* Error/Success Alerts */}
+        {error && (
+          <div className="auth-alert error">
+            <span className="auth-alert-icon">⚠️</span>
+            <div className="auth-alert-content">{error}</div>
+          </div>
+        )}
+
+        {success && (
+          <div className="auth-alert success">
+            <span className="auth-alert-icon">✅</span>
+            <div className="auth-alert-content">{success}</div>
+          </div>
+        )}
+
+        {/* Account Type Tabs */}
+        <div className="auth-tabs">
           <button
-            className={`tab-btn ${tab === 'company' ? 'active' : ''}`}
+            className={`auth-tab ${tab === 'company' ? 'active' : ''}`}
             onClick={() => setTab('company')}
+            type="button"
           >
-            Company Admin
+            <span className="tab-icon">🏢</span>
+            <span className="tab-label">Company Admin</span>
+            <span className="tab-desc">Register your company</span>
           </button>
           <button
-            className={`tab-btn ${tab === 'sales' ? 'active' : ''}`}
+            className={`auth-tab ${tab === 'sales' ? 'active' : ''}`}
             onClick={() => setTab('sales')}
+            type="button"
           >
-            Sales Person
+            <span className="tab-icon">👤</span>
+            <span className="tab-label">Sales Person</span>
+            <span className="tab-desc">Join as sales executive</span>
           </button>
         </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+        {/* Company Registration Form */}
+        {tab === 'company' && (
+          <form className="auth-form" onSubmit={handleCompanySubmit}>
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Personal Information</h3>
+              
+              <div className="auth-form-row">
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-name">Your Full Name</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">👤</span>
+                    <input
+                      id="company-name"
+                      type="text"
+                      className="auth-input"
+                      name="name"
+                      value={companyForm.name}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="John Doe"
+                      autoComplete="name"
+                    />
+                  </div>
+                </div>
 
-        {tab === 'company' ? (
-          <form onSubmit={handleCompanySubmit}>
-            <div className="form-group">
-              <label>Your Name</label>
-              <input
-                type="text"
-                name="name"
-                value={companyForm.name}
-                onChange={handleCompanyChange}
-                required
-              />
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-email">Your Email</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">✉️</span>
+                    <input
+                      id="company-email"
+                      type="email"
+                      className="auth-input"
+                      name="email"
+                      value={companyForm.email}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="john@company.com"
+                      autoComplete="email"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Your Email</label>
-              <input
-                type="email"
-                name="email"
-                value={companyForm.email}
-                onChange={handleCompanyChange}
-                required
-              />
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Company Details</h3>
+              
+              <div className="auth-form-row">
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-name-field">Company Name</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">🏢</span>
+                    <input
+                      id="company-name-field"
+                      type="text"
+                      className="auth-input"
+                      name="companyName"
+                      value={companyForm.companyName}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="Acme Corporation"
+                    />
+                  </div>
+                </div>
+
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-email-field">Company Email</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">📧</span>
+                    <input
+                      id="company-email-field"
+                      type="email"
+                      className="auth-input"
+                      name="companyEmail"
+                      value={companyForm.companyEmail}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="info@company.com"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Company Name</label>
-              <input
-                type="text"
-                name="companyName"
-                value={companyForm.companyName}
-                onChange={handleCompanyChange}
-                required
-              />
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Security</h3>
+              
+              <div className="auth-form-row">
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-password">Password</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">🔒</span>
+                    <input
+                      id="company-password"
+                      type="password"
+                      className="auth-input"
+                      name="password"
+                      value={companyForm.password}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="Create a strong password"
+                      minLength="8"
+                    />
+                  </div>
+                </div>
+
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="company-confirm-password">Confirm Password</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">🔐</span>
+                    <input
+                      id="company-confirm-password"
+                      type="password"
+                      className="auth-input"
+                      name="confirmPassword"
+                      value={companyForm.confirmPassword}
+                      onChange={handleCompanyChange}
+                      required
+                      placeholder="Confirm your password"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Company Email</label>
-              <input
-                type="email"
-                name="companyEmail"
-                value={companyForm.companyEmail}
-                onChange={handleCompanyChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={companyForm.password}
-                onChange={handleCompanyChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={companyForm.confirmPassword}
-                onChange={handleCompanyChange}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Registering...' : 'Register Company'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleSalesSubmit}>
-            <div className="form-group">
-              <label>Your Name</label>
-              <input
-                type="text"
-                name="name"
-                value={salesForm.name}
-                onChange={handleSalesChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={salesForm.email}
-                onChange={handleSalesChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Company ID</label>
-              <input
-                type="number"
-                name="companyId"
-                value={salesForm.companyId}
-                onChange={handleSalesChange}
-                required
-                placeholder="Enter your company ID"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={salesForm.password}
-                onChange={handleSalesChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={salesForm.confirmPassword}
-                onChange={handleSalesChange}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Registering...' : 'Register as Sales Person'}
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Creating Account...
+                </>
+              ) : (
+                'Create Company Account'
+              )}
             </button>
           </form>
         )}
 
+        {/* Sales Person Registration Form */}
+        {tab === 'sales' && (
+          <form className="auth-form" onSubmit={handleSalesSubmit}>
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Personal Information</h3>
+              
+              <div className="auth-form-group">
+                <label className="auth-label" htmlFor="sales-name">Your Full Name</label>
+                <div className="auth-input-wrapper">
+                  <span className="auth-input-icon" aria-hidden="true">👤</span>
+                  <input
+                    id="sales-name"
+                    type="text"
+                    className="auth-input"
+                    name="name"
+                    value={salesForm.name}
+                    onChange={handleSalesChange}
+                    required
+                    placeholder="Jane Smith"
+                    autoComplete="name"
+                  />
+                </div>
+              </div>
+
+              <div className="auth-form-group">
+                <label className="auth-label" htmlFor="sales-email">Email Address</label>
+                <div className="auth-input-wrapper">
+                  <span className="auth-input-icon" aria-hidden="true">✉️</span>
+                  <input
+                    id="sales-email"
+                    type="email"
+                    className="auth-input"
+                    name="email"
+                    value={salesForm.email}
+                    onChange={handleSalesChange}
+                    required
+                    placeholder="jane@example.com"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Company Preference (Optional)</h3>
+              
+              <div className="auth-form-group">
+                <label className="auth-label" htmlFor="sales-company">Preferred Company ID</label>
+                <div className="auth-input-wrapper">
+                  <span className="auth-input-icon" aria-hidden="true">🏢</span>
+                  <input
+                    id="sales-company"
+                    type="text"
+                    className="auth-input"
+                    name="companyId"
+                    value={salesForm.companyId}
+                    onChange={handleSalesChange}
+                    placeholder="Enter company ID if you have one"
+                  />
+                </div>
+                <p className="auth-input-hint">If you know your company's ID, enter it here to be linked automatically.</p>
+              </div>
+            </div>
+
+            <div className="auth-form-section">
+              <h3 className="auth-form-section-title">Security</h3>
+              
+              <div className="auth-form-row">
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="sales-password">Password</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">🔒</span>
+                    <input
+                      id="sales-password"
+                      type="password"
+                      className="auth-input"
+                      name="password"
+                      value={salesForm.password}
+                      onChange={handleSalesChange}
+                      required
+                      placeholder="Create a strong password"
+                      minLength="8"
+                    />
+                  </div>
+                </div>
+
+                <div className="auth-form-group">
+                  <label className="auth-label" htmlFor="sales-confirm-password">Confirm Password</label>
+                  <div className="auth-input-wrapper">
+                    <span className="auth-input-icon" aria-hidden="true">🔐</span>
+                    <input
+                      id="sales-confirm-password"
+                      type="password"
+                      className="auth-input"
+                      name="confirmPassword"
+                      value={salesForm.confirmPassword}
+                      onChange={handleSalesChange}
+                      required
+                      placeholder="Confirm your password"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Creating Account...
+                </>
+              ) : (
+                'Create Sales Account'
+              )}
+            </button>
+          </form>
+        )}
+
+        {/* Footer */}
         <div className="auth-footer">
-          <p>Already have an account?</p>
-          <Link to="/login" className="link">Login Here</Link>
+          Already have an account? <Link to="/login">Sign in</Link>
         </div>
       </div>
     </div>

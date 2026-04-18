@@ -40,6 +40,8 @@ const FloatingChatBot = () => {
       setUnreadCount(0);
     } catch (err) {
       console.error('Failed to load conversation:', err);
+      // Don't logout user on chat API errors - just show message
+      setError('Could not load chat history');
     }
   };
 

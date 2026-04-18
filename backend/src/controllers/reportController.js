@@ -11,9 +11,9 @@ const User = require('../models/User');
  */
 const getCommissionReport = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
-
-    const commissions = await Commission.getCommissionsByCompany(companyId);
+    const commissions = req.user.role === 'platform_admin'
+      ? await Commission.getAllCommissions()
+      : await Commission.getCommissionsByCompany(req.user.companyId);
 
     // Calculate summary
     const summary = {
@@ -47,9 +47,9 @@ const getCommissionReport = async (req, res) => {
  */
 const getSalesReport = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
-
-    const orders = await Order.getOrdersByCompany(companyId);
+    const orders = req.user.role === 'platform_admin'
+      ? await Order.getAllOrders()
+      : await Order.getOrdersByCompany(req.user.companyId);
 
     // Calculate summary
     const summary = {
@@ -83,10 +83,11 @@ const getSalesReport = async (req, res) => {
  */
 const getLeaderboard = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
     const limit = req.query.limit || 10;
 
-    const leaderboard = await Commission.getLeaderboard(companyId, parseInt(limit));
+    const leaderboard = req.user.role === 'platform_admin'
+      ? await Commission.getLeaderboard(null, parseInt(limit))
+      : await Commission.getLeaderboard(req.user.companyId, parseInt(limit));
 
     return res.status(200).json({
       success: true,
@@ -108,35 +109,47 @@ const getLeaderboard = async (req, res) => {
  */
 const getDashboardStats = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
+    const companyId = req.user.companyId || null;
     const userId = req.user.id;
+    const isPlatformAdmin = req.user.role === 'platform_admin';
 
     // Get all orders
-    const allOrders = await Order.getOrdersByCompany(companyId);
+    const allOrders = isPlatformAdmin
+      ? await Order.getAllOrders()
+      : await Order.getOrdersByCompany(companyId);
     
     // Get my orders if sales person
     let myOrders = [];
     if (req.user.role === 'sales') {
-      myOrders = await Order.getOrdersBySalesPerson(userId, companyId);
+      myOrders = await Order.getOrdersBySalesPerson(userId);
     }
 
     // Get commissions
-    const commissions = await Commission.getCommissionsByCompany(companyId);
+    const commissions = isPlatformAdmin
+      ? await Commission.getAllCommissions()
+      : await Commission.getCommissionsByCompany(companyId);
     
     // Get my commissions if sales person
     let myCommissions = [];
     if (req.user.role === 'sales') {
-      myCommissions = await Commission.getCommissionsBySalesPerson(userId, companyId);
+      myCommissions = await Commission.getCommissionsBySalesPerson(userId);
     }
 
     // Get verified sales persons count
-    const salesPersons = await User.getVerifiedSalesPersons(companyId);
+    const salesPersons = isPlatformAdmin
+      ? await User.getVerifiedSalesPersons()
+      : await User.getVerifiedSalesPersons(companyId);
+
+    const pendingSalesPersons = isPlatformAdmin
+      ? await User.getPendingSalesPersons()
+      : await User.getPendingSalesPersons(companyId);
 
     const stats = {
       totalSales: allOrders.reduce((sum, o) => sum + parseFloat(o.amount), 0),
       totalOrders: allOrders.length,
       totalCommissionsIssued: commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0),
-      verifiedSalesPersons: salesPersons.length
+      verifiedSalesPersons: salesPersons.length,
+      pendingSalesApprovals: pendingSalesPersons.length
     };
 
     // Add personal stats if sales person

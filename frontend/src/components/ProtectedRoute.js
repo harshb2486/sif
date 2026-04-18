@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export const ProtectedRoute = ({ 
@@ -11,6 +12,7 @@ export const ProtectedRoute = ({
   requireVerification = false 
 }) => {
   const { isAuthenticated, user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -25,8 +27,24 @@ export const ProtectedRoute = ({
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  const allowedRoles = Array.isArray(requiredRole)
+    ? requiredRole
+    : requiredRole
+      ? [requiredRole]
+      : [];
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Block unverified sales users from accessing protected areas,
+  // allowing only the waiting-approval page.
+  if (
+    user?.role === 'sales' &&
+    !user?.is_verified &&
+    location.pathname !== '/waiting-approval'
+  ) {
+    return <Navigate to="/waiting-approval" replace />;
   }
 
   if (requireVerification && !user?.is_verified) {

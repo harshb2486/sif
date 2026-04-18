@@ -11,28 +11,21 @@ const emailService = require('../services/emailService');
  */
 const getSalesPersons = async (req, res) => {
   try {
-    const { status } = req.query;
-    const companyId = req.user.companyId;
-
-    if (!companyId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Invalid company ID'
-      });
-    }
-
-    let users;
-
-    if (status === 'pending') {
-      users = await User.getPendingSalesPersons(companyId);
-    } else {
-      users = await User.getVerifiedSalesPersons(companyId);
-    }
+    const { status = 'pending', search = '', page = 1, limit = 10 } = req.query;
+    const result = await User.getSalesPersonsForAdmin({ status, search, page, limit });
 
     return res.status(200).json({
       success: true,
       message: 'Sales persons retrieved successfully',
-      data: users
+      data: result.users,
+      meta: {
+        pagination: result.pagination,
+        counts: result.counts,
+        filters: {
+          status,
+          search: String(search || '')
+        }
+      }
     });
   } catch (error) {
     console.error('Get Sales Persons Error:', error);
@@ -50,18 +43,10 @@ const getSalesPersons = async (req, res) => {
 const approveSalesPerson = async (req, res) => {
   try {
     const { id } = req.params;
-    const companyId = req.user.companyId;
 
-    if (!companyId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Invalid company ID'
-      });
-    }
-
-    // Verify the sales person belongs to the company
+    // Verify user exists
     const user = await User.findUserById(id);
-    if (!user || user.company_id !== companyId) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: 'Sales person not found'
@@ -77,17 +62,18 @@ const approveSalesPerson = async (req, res) => {
     }
 
     // Approve sales person
-    await User.verifySalesPerson(id, companyId);
+    await User.verifySalesPerson(id);
 
     // Send approval email
-    await emailService.sendApprovalNotification(user.email, user.name);
+    const emailSent = await emailService.sendApprovalNotification(user.email, user.name);
 
     return res.status(200).json({
       success: true,
       message: 'Sales person approved successfully',
       data: {
         userId: id,
-        approved: true
+        approved: true,
+        emailSent
       }
     });
   } catch (error) {

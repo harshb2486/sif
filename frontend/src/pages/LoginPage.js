@@ -1,4 +1,4 @@
-// Login Page
+// Login Page - Modern SaaS Design
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -11,6 +11,7 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -31,55 +32,129 @@ export const LoginPage = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <h1>📊 Field Sales Management</h1>
-        <h2>Login</h2>
+    <div className="auth-page-container">
+      <div className="auth-card">
+        {/* Header */}
+        <div className="auth-header">
+          <div className="auth-logo-wrapper">
+            <div className="auth-logo" aria-hidden="true">
+              📊
+            </div>
+          </div>
+          <h1 className="auth-title">Welcome Back</h1>
+          <p className="auth-subtitle">Sign in to your Field Sales CRM account</p>
+        </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {/* Error Alert */}
+        {error && (
+          <div className="auth-alert error">
+            <span className="auth-alert-icon">⚠️</span>
+            <div className="auth-alert-content">{error}</div>
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="your@email.com"
-            />
+        {/* Login Form */}
+        <form className="auth-form" onSubmit={handleSubmit}>
+          {/* Email Field */}
+          <div className="auth-form-group">
+            <label className="auth-label" htmlFor="email">Email Address</label>
+            <div className="auth-input-wrapper">
+              <span className="auth-input-icon" aria-hidden="true">✉️</span>
+              <input
+                id="email"
+                type="email"
+                className="auth-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="your@email.com"
+                autoComplete="email"
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
+          {/* Password Field */}
+          <div className="auth-form-group">
+            <label className="auth-label" htmlFor="password">Password</label>
+            <div className="auth-input-wrapper">
+              <span className="auth-input-icon" aria-hidden="true">🔒</span>
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                className="auth-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter your password"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
 
+          {/* Remember Me & Forgot Password */}
+          <div className="auth-options">
+            <label className="auth-remember">
+              <input type="checkbox" />
+              <span>Remember me</span>
+            </label>
+            <a href="/forgot-password" className="auth-forgot-password">
+              Forgot password?
+            </a>
+          </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="btn btn-primary"
+            className="auth-submit-btn"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
+        {/* Divider */}
+        <div className="auth-divider">
+          <span>or continue with</span>
+        </div>
+
+        {/* Social Login */}
+        <div className="auth-social-buttons">
+          <button type="button" className="auth-social-btn">
+            <span aria-hidden="true">G</span>
+            Google
+          </button>
+          <button type="button" className="auth-social-btn">
+            <span aria-hidden="true">f</span>
+            Facebook
+          </button>
+        </div>
+
+        {/* Footer */}
         <div className="auth-footer">
-          <p>Don't have an account?</p>
-          <Link to="/register" className="link">Register Here</Link>
+          Don't have an account?{' '}
+          <Link to="/register">Create an account</Link>
         </div>
       </div>
     </div>

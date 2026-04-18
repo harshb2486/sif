@@ -15,7 +15,7 @@ const sendMessage = async (req, res, next) => {
   try {
     const { message, conversationId } = req.body;
     const userId = req.user?.id;
-    const companyId = req.user?.company_id;
+    const companyId = req.user?.companyId || req.user?.company_id;
 
     // Validation
     if (!message || !message.trim()) {
@@ -93,7 +93,7 @@ const sendMessage = async (req, res, next) => {
 const getConversation = async (req, res, next) => {
   try {
     const { conversationId } = req.params;
-    const companyId = req.user?.company_id;
+    const companyId = req.user?.companyId || req.user?.company_id;
 
     if (!companyId) {
       throw new AppError('Authentication required', 401);
@@ -121,7 +121,7 @@ const getConversation = async (req, res, next) => {
 const getConversations = async (req, res, next) => {
   try {
     const userId = req.user?.id;
-    const companyId = req.user?.company_id;
+    const companyId = req.user?.companyId || req.user?.company_id;
     const limit = parseInt(req.query.limit) || 20;
 
     if (!userId || !companyId) {
@@ -150,7 +150,7 @@ const searchConversations = async (req, res, next) => {
   try {
     const { q } = req.query;
     const userId = req.user?.id;
-    const companyId = req.user?.company_id;
+    const companyId = req.user?.companyId || req.user?.company_id;
 
     if (!q || q.length < 2) {
       throw new ValidationError('Search query must be at least 2 characters');
@@ -182,7 +182,7 @@ const searchConversations = async (req, res, next) => {
 const deleteConversation = async (req, res, next) => {
   try {
     const { conversationId } = req.params;
-    const companyId = req.user?.company_id;
+    const companyId = req.user?.companyId || req.user?.company_id;
 
     if (!companyId) {
       throw new AppError('Authentication required', 401);

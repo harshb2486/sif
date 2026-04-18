@@ -20,16 +20,19 @@ export const SalesPersonsPage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [approvingIds, setApprovingIds] = useState([]);
+  const [counts, setCounts] = useState({ pending: 0, verified: 0 });
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0, limit: 10 });
 
   // Fetch list from API
   const fetchSalesPersons = async () => {
     try {
       setError('');
-      const response = await companiesAPI.getSalesPersons(filter);
+      const response = await companiesAPI.getSalesPersons(filter, debouncedSearch, page, limit);
       const list = response.data.data || [];
+      const meta = response.data.meta || {};
       setSalesPersons(list);
-      // reset paging
-      setPage(1);
+      setCounts(meta.counts || { pending: 0, verified: 0 });
+      setPagination(meta.pagination || { page: 1, pages: 1, total: list.length, limit });
     } catch (err) {
       console.error('Fetch sales persons error', err);
       setError('Failed to load sales persons');
@@ -43,7 +46,7 @@ export const SalesPersonsPage = () => {
     setLoading(true);
     fetchSalesPersons();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [filter, debouncedSearch, page, limit]);
 
   // Debounce search input
   useEffect(() => {
@@ -51,26 +54,18 @@ export const SalesPersonsPage = () => {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  // Derived filtered+searched list
-  const filteredList = useMemo(() => {
-    const q = debouncedSearch.toLowerCase();
-    if (!q) return salesPersons;
-    return salesPersons.filter(p => {
-      return (
-        (p.name && p.name.toLowerCase().includes(q)) ||
-        (p.email && p.email.toLowerCase().includes(q))
-      );
-    });
-  }, [salesPersons, debouncedSearch]);
-
-  const total = filteredList.length;
-  const pages = Math.max(1, Math.ceil(total / limit));
-  const currentPage = Math.min(page, pages);
-  const paginated = filteredList.slice((currentPage - 1) * limit, currentPage * limit);
+  const total = pagination.total || salesPersons.length;
+  const pages = pagination.pages || 1;
+  const currentPage = pagination.page || page;
+  const paginated = useMemo(() => salesPersons, [salesPersons]);
 
   useEffect(() => {
-    if (page > pages) setPage(1);
-  }, [pages]);
+    setPage(1);
+  }, [filter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const confirmApprove = async (person) => {
     const result = await Swal.fire({
@@ -90,8 +85,9 @@ export const SalesPersonsPage = () => {
   const handleApprove = async (id) => {
     try {
       setApprovingIds(prev => [...prev, id]);
-      await companiesAPI.approveSalesPerson(id);
-      notify.success('Sales person approved');
+      const response = await companiesAPI.approveSalesPerson(id);
+      const emailSent = response?.data?.data?.emailSent;
+      notify.success(emailSent ? 'Sales person approved and email sent' : 'Sales person approved (email not sent)');
       // re-fetch
       await fetchSalesPersons();
     } catch (err) {
@@ -119,13 +115,13 @@ export const SalesPersonsPage = () => {
                 className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
                 onClick={() => setFilter('pending')}
               >
-                ⏳ Pending ({salesPersons.filter(s => !s.is_verified).length})
+                  ⏳ Pending ({counts.pending || 0})
               </button>
               <button
                 className={`filter-btn ${filter === 'verified' ? 'active' : ''}`}
                 onClick={() => setFilter('verified')}
               >
-                ✅ Verified ({salesPersons.filter(s => s.is_verified).length})
+                  ✅ Verified ({counts.verified || 0})
               </button>
             </div>
 
@@ -205,7 +201,7 @@ export const SalesPersonsPage = () => {
 
                   <div className="pagination" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
                     <div>
-                      Showing <strong>{(currentPage - 1) * limit + 1}</strong> - <strong>{Math.min(currentPage * limit, total)}</strong> of <strong>{total}</strong>
+                      Showing <strong>{total === 0 ? 0 : (currentPage - 1) * limit + 1}</strong> - <strong>{Math.min(currentPage * limit, total)}</strong> of <strong>{total}</strong>
                     </div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                       <button className="btn-sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Prev</button>

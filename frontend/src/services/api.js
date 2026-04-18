@@ -29,8 +29,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
+    // Only logout on main auth API endpoints - NOT for chat
+    if (error.response?.status === 401 && 
+        !error.config.url.includes('/chat/') && 
+        !error.config.url.includes('/chat')) {
+      // Unauthorized - clear token and redirect to login only for non-chat endpoints
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -54,7 +57,14 @@ export const authAPI = {
 // COMPANIES API
 export const companiesAPI = {
   getDetails: (id) => api.get(`/companies/${id}`),
-  getSalesPersons: (status) => api.get(`/companies/sales-persons?status=${status}`),
+  getSalesPersons: (status = 'pending', search = '', page = 1, limit = 10) => {
+    const params = new URLSearchParams();
+    params.set('status', status);
+    if (search) params.set('search', search);
+    params.set('page', String(page));
+    params.set('limit', String(limit));
+    return api.get(`/companies/sales-persons?${params.toString()}`);
+  },
   approveSalesPerson: (id) => api.put(`/companies/sales/${id}/approve`)
 };
 
@@ -118,8 +128,13 @@ export const exportsAPI = {
 
 // CHAT API (Sales Assistant)
 export const chatAPI = {
-  sendMessage: (message, conversationId = null) => 
-    api.post('/chat/message', { message, conversationId }),
+  sendMessage: (message, conversationId = null) => {
+    const payload = { message };
+    if (conversationId) {
+      payload.conversationId = conversationId;
+    }
+    return api.post('/chat/message', payload);
+  },
   getConversations: (limit = 20) => 
     api.get(`/chat/conversations?limit=${limit}`),
   getConversation: (conversationId) => 

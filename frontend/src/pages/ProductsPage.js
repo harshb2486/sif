@@ -79,10 +79,10 @@ export const ProductsPage = () => {
   };
 
   return (
-    <>
-      <Header />
+    <div className="page-layout">
       <Sidebar />
       <main className="main-content">
+        <Header />
         <div className="page-container">
           <div className="page-header">
             <h1>📦 Products</h1>
@@ -212,6 +212,6 @@ export const ProductsPage = () => {
           )}
         </div>
       </main>
-    </>
+    </div>
   );
 };

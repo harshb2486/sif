@@ -109,7 +109,7 @@ const registerSalesPerson = async (req, res) => {
     const { name, email, password, confirmPassword, companyId } = req.body;
 
     // Validation
-    if (!name || !email || !password || !confirmPassword || !companyId) {
+    if (!name || !email || !password || !confirmPassword) {
       return res.status(400).json({
         success: false,
         message: 'All fields are required'
@@ -137,13 +137,20 @@ const registerSalesPerson = async (req, res) => {
       });
     }
 
-    // Check if company exists
-    const company = await Company.findCompanyById(companyId);
-    if (!company) {
-      return res.status(404).json({
-        success: false,
-        message: 'Company not found'
-      });
+    // Global sales registration: company is optional.
+    // If provided and valid, keep a preferred company link for reporting/reference.
+    let linkedCompanyId = null;
+
+    if (companyId !== undefined && companyId !== null && String(companyId).trim() !== '') {
+      const trimmedCompanyId = String(companyId).trim();
+      const parsedCompanyId = Number(trimmedCompanyId);
+
+      if (Number.isInteger(parsedCompanyId) && parsedCompanyId > 0) {
+        const company = await Company.findCompanyById(parsedCompanyId);
+        if (company) {
+          linkedCompanyId = parsedCompanyId;
+        }
+      }
     }
 
     // Check if user already exists
@@ -159,18 +166,18 @@ const registerSalesPerson = async (req, res) => {
     const hashedPassword = await hashPassword(password);
 
     // Create sales person user (not verified by default)
-    const userId = await User.createUser(name, email, hashedPassword, 'sales', companyId);
+    const userId = await User.createUser(name, email, hashedPassword, 'sales', linkedCompanyId);
 
     return res.status(201).json({
       success: true,
-      message: 'Sales person registered successfully. Waiting for admin approval.',
+      message: 'Sales person registered successfully. Waiting for platform admin approval.',
       data: {
         user: {
           id: userId,
           name,
           email,
           role: 'sales',
-          companyId,
+          companyId: linkedCompanyId,
           is_verified: false
         }
       }

@@ -14,7 +14,7 @@ const router = express.Router();
 router.get(
   '/sales-persons',
   authMiddleware,
-  roleMiddleware('company_admin', 'platform_admin'),
+  roleMiddleware('platform_admin'),
   companyController.getSalesPersons
 );
 
@@ -22,7 +22,7 @@ router.get(
 router.put(
   '/sales/:id/approve',
   authMiddleware,
-  roleMiddleware('company_admin', 'platform_admin'),
+  roleMiddleware('platform_admin'),
   companyController.approveSalesPerson
 );
 

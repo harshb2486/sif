@@ -1,5 +1,5 @@
 // App.js
-// Main React application with routing
+// Main React application with routing and modern layout
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -35,105 +35,122 @@ const AppContent = () => {
   }
 
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
-      />
-      <Route
-        path="/register"
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />}
-      />
+    <div className="app-wrapper">
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+        />
+        <Route
+          path="/register"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />}
+        />
 
-      {/* Protected Routes - Common */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes - Common */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Protected Routes - Waiting Approval */}
-      <Route
-        path="/waiting-approval"
-        element={
-          <ProtectedRoute>
-            <WaitingApprovalPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes - Waiting Approval */}
+        <Route
+          path="/waiting-approval"
+          element={
+            <ProtectedRoute>
+              <WaitingApprovalPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Protected Routes - Company Admin Only */}
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute requiredRole="company_admin">
-            <ProductsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/sales-persons"
-        element={
-          <ProtectedRoute requiredRole="company_admin">
-            <SalesPersonsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/reports"
-        element={
-          <ProtectedRoute requiredRole="company_admin">
-            <ReportsPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes - Company Admin Only */}
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute requiredRole="company_admin">
+              <ProductsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute requiredRole={["company_admin", "platform_admin"]}>
+              <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Protected Routes - Sales Person Only */}
-      <Route
-        path="/create-order"
-        element={
-          <ProtectedRoute requiredRole="sales" requireVerification={true}>
-            <CreateOrderPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-orders"
-        element={
-          <ProtectedRoute requiredRole="sales" requireVerification={true}>
-            <MyOrdersPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-commissions"
-        element={
-          <ProtectedRoute requiredRole="sales" requireVerification={true}>
-            <MyCommissionsPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes - Platform Admin Only */}
+        <Route
+          path="/sales-persons"
+          element={
+            <ProtectedRoute requiredRole="platform_admin">
+              <SalesPersonsPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Chat - Available for all authenticated users */}
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes - Sales Person Only */}
+        <Route
+          path="/create-order"
+          element={
+            <ProtectedRoute requiredRole="sales" requireVerification={true}>
+              <CreateOrderPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute requiredRole="sales" requireVerification={true}>
+              <MyOrdersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-commissions"
+          element={
+            <ProtectedRoute requiredRole="sales" requireVerification={true}>
+              <MyCommissionsPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Catch all - redirect to dashboard or login */}
-      <Route
-        path="*"
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
+        {/* Chat - Available for all authenticated users */}
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all - redirect to dashboard or login */}
+        <Route
+          path="*"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
+        />
+      </Routes>
+      <FloatingChatBot />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
       />
-    </Routes>
+    </div>
   );
 };
 
@@ -142,19 +159,6 @@ function App() {
     <Router>
       <AuthProvider>
         <AppContent />
-        <FloatingChatBot />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
       </AuthProvider>
     </Router>
   );

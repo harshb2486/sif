@@ -27,13 +27,17 @@ const createMessage = async (userId, companyId, conversationId, role, content, t
 const getConversationMessages = async (companyId, conversationId, limit = 50) => {
   const connection = await pool.getConnection();
   try {
-    const [messages] = await connection.execute(
+    const safeLimit = Number.isInteger(Number(limit)) && Number(limit) > 0
+      ? Number(limit)
+      : 50;
+
+    const [messages] = await connection.query(
       `SELECT id, role, content, context_data, created_at 
        FROM chat_messages 
        WHERE company_id = ? AND conversation_id = ? 
        ORDER BY created_at DESC 
-       LIMIT ?`,
-      [companyId, conversationId, limit]
+       LIMIT ${safeLimit}`,
+      [companyId, conversationId]
     );
     return messages.reverse(); // Return chronological order
   } finally {
@@ -47,13 +51,17 @@ const getConversationMessages = async (companyId, conversationId, limit = 50) =>
 const getUserConversations = async (userId, companyId, limit = 20) => {
   const connection = await pool.getConnection();
   try {
-    const [sessions] = await connection.execute(
+    const safeLimit = Number.isInteger(Number(limit)) && Number(limit) > 0
+      ? Number(limit)
+      : 20;
+
+    const [sessions] = await connection.query(
       `SELECT conversation_id, title, total_messages, total_tokens, created_at, updated_at 
        FROM chat_sessions 
        WHERE user_id = ? AND company_id = ? 
        ORDER BY updated_at DESC 
-       LIMIT ?`,
-      [userId, companyId, limit]
+       LIMIT ${safeLimit}`,
+      [userId, companyId]
     );
     return sessions;
   } finally {

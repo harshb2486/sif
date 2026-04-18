@@ -57,7 +57,7 @@ router.get('/status', asyncHandler(chatController.getChatStatus));
 router.post('/message',
   validate(Joi.object({
     message: Joi.string().max(5000).required(),
-    conversationId: Joi.string().optional()
+    conversationId: Joi.string().allow(null, '').optional()
   })),
   asyncHandler(chatController.sendMessage)
 );

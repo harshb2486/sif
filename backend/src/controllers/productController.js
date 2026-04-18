@@ -77,9 +77,9 @@ const createProduct = async (req, res) => {
  */
 const getProducts = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
-
-    const products = await Product.getProductsByCompany(companyId);
+    const products = req.user.role === 'sales'
+      ? await Product.getAllProducts()
+      : await Product.getProductsByCompany(req.user.companyId);
 
     return res.status(200).json({
       success: true,
@@ -102,9 +102,10 @@ const getProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const companyId = req.user.companyId;
 
-    const product = await Product.findProductById(id, companyId);
+    const product = req.user.role === 'sales'
+      ? await Product.findProductById(id)
+      : await Product.findProductById(id, req.user.companyId);
     if (!product) {
       return res.status(404).json({
         success: false,

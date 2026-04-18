@@ -12,9 +12,7 @@ const { calculateCommission } = require('../utils/helpers');
  */
 const getSalesProducts = async (req, res) => {
   try {
-    const companyId = req.user.companyId;
-
-    const products = await Product.getProductsByCompany(companyId);
+    const products = await Product.getAllProducts();
 
     return res.status(200).json({
       success: true,
@@ -38,7 +36,6 @@ const createOrder = async (req, res) => {
   try {
     const { productId, clientName, amount } = req.body;
     const salesPersonId = req.user.id;
-    const companyId = req.user.companyId;
 
     // Validation
     if (!productId || !clientName || !amount) {
@@ -55,14 +52,16 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Check if product exists and belongs to company
-    const product = await Product.findProductById(productId, companyId);
+    // Check if product exists globally
+    const product = await Product.findProductById(productId);
     if (!product) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
+
+    const companyId = product.company_id;
 
     // Create order
     const orderId = await Order.createOrder(
@@ -110,9 +109,8 @@ const createOrder = async (req, res) => {
 const getMyOrders = async (req, res) => {
   try {
     const salesPersonId = req.user.id;
-    const companyId = req.user.companyId;
 
-    const orders = await Order.getOrdersBySalesPerson(salesPersonId, companyId);
+    const orders = await Order.getOrdersBySalesPerson(salesPersonId);
 
     return res.status(200).json({
       success: true,
@@ -135,10 +133,9 @@ const getMyOrders = async (req, res) => {
 const getMyCommissions = async (req, res) => {
   try {
     const salesPersonId = req.user.id;
-    const companyId = req.user.companyId;
 
-    const commissions = await Commission.getCommissionsBySalesPerson(salesPersonId, companyId);
-    const total = await Commission.getTotalCommissionBySalesPerson(salesPersonId, companyId);
+    const commissions = await Commission.getCommissionsBySalesPerson(salesPersonId);
+    const total = await Commission.getTotalCommissionBySalesPerson(salesPersonId);
 
     return res.status(200).json({
       success: true,

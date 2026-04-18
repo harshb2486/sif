@@ -1,81 +1,287 @@
-/* Sidebar Styles */
+/* 
+ * Sidebar Styles - Clean SaaS Dashboard
+ */
 
+@import '../styles/variables.css';
+
+/* Sidebar Container */
 .sidebar {
-  background: #2c3e50;
-  color: white;
-  height: 100vh;
   position: fixed;
-  left: 0;
   top: 0;
-  transition: width 0.3s ease;
-  width: 250px;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: #111827;
+  color: #d1d5db;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
   overflow-y: auto;
-  margin-top: 60px;
-  z-index: 99;
+}
+
+/* Desktop - Sidebar always visible, content has margin */
+@media (min-width: 1024px) {
+  .sidebar {
+    transform: translateX(0) !important;
+  }
+}
+
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar.closed {
-  width: 60px;
+  transform: translateX(-100%);
 }
 
-.toggle-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 1rem;
-  width: 100%;
-  text-align: center;
-  border-bottom: 1px solid #34495e;
-  transition: all 0.3s ease;
+/* Role-based theming */
+.sidebar.role-platform_admin {
+  background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
 }
 
-.toggle-btn:hover {
-  background: #34495e;
+.sidebar.role-company_admin {
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
 }
 
-.nav-menu {
+.sidebar.role-sales {
+  background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sidebar-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.sidebar-logo-text {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem 0;
+}
+
+.sidebar-brand {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+
+.sidebar-tagline {
+  margin: 0;
+  font-size: 11px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sidebar-eyebrow {
+  margin: 0 0 4px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sidebar-workspace {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+}
+
+/* Navigation */
+.nav-menu {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .nav-item {
-  display: block;
-  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #d1d5db;
   text-decoration: none;
-  color: #ecf0f1;
-  transition: all 0.3s ease;
-  border-left: 3px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .nav-item:hover {
-  background: #34495e;
-  border-left-color: #667eea;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .nav-item.active {
-  background: #34495e;
-  border-left-color: #667eea;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
+  color: white;
   font-weight: 600;
 }
 
-.sidebar.closed .nav-menu {
-  display: none;
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
 }
 
-@media (max-width: 768px) {
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-footer-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.sidebar-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+  margin: 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fde68a;
+}
+
+.status-badge.verified {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}
+
+/* Toggle Button - Only visible on mobile/tablet */
+.sidebar-toggle {
+  display: none !important;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-primary);
+  z-index: calc(var(--z-sidebar) + 10);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: #f9fafb;
+}
+
+/* Ensure toggle is NEVER visible on desktop */
+@media (min-width: 1024px) {
+  .sidebar-toggle {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Backdrop */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.6);
+  z-index: calc(var(--z-sidebar) - 1);
+}
+
+/* Responsive - Show hamburger only on mobile/tablet */
+@media (max-width: 1023px) {
+  .sidebar-toggle {
+    display: flex !important;
+  }
+
   .sidebar {
-    width: 60px;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
   }
 
-  .nav-menu {
-    display: none;
-  }
-
-  .toggle-btn {
+  .sidebar-backdrop.visible {
     display: block;
+  }
+
+  .sidebar.closed {
+    transform: translateX(-105%);
   }
 }

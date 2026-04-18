@@ -38,14 +38,14 @@ export const WaitingApprovalPage = () => {
             <div className="waiting-tips">
               <h3>What happens next?</h3>
               <ul>
-                <li>✓ Your company admin will review your profile</li>
+                <li>✓ Platform admin will review your profile</li>
                 <li>✓ You'll be notified via email once approved</li>
                 <li>✓ After approval, you can start creating sales and earning commissions</li>
               </ul>
             </div>
 
             <div className="waiting-contact">
-              <p>Questions? Contact your company administrator for more information.</p>
+              <p>Questions? Contact platform support for more information.</p>
             </div>
           </div>
         </div>

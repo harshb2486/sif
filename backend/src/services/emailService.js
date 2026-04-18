@@ -40,8 +40,10 @@ class EmailService {
         `,
       });
       console.log(`✅ Approval notification sent to ${email}`);
+      return true;
     } catch (error) {
       console.error('❌ Error sending approval email:', error);
+      return false;
     }
   }
 
