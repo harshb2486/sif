@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { RiSendPlane2Line, RiLoader4Line } from 'react-icons/ri';
 import './ChatInput.css';
 
 const ChatInput = ({ onSendMessage, disabled = false, placeholder = 'Type a message...' }) => {
@@ -6,14 +7,11 @@ const ChatInput = ({ onSendMessage, disabled = false, placeholder = 'Type a mess
   const [rows, setRows] = useState(1);
   const textareaRef = useRef(null);
 
-  // Auto-expand textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = Math.min(scrollHeight, 120) + 'px';
-      
-      // Calculate rows for display
       const lineCount = input.split('\n').length;
       setRows(Math.min(lineCount, 5));
     }
@@ -21,7 +19,6 @@ const ChatInput = ({ onSendMessage, disabled = false, placeholder = 'Type a mess
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (input.trim() && !disabled) {
       onSendMessage(input.trim());
       setInput('');
@@ -33,7 +30,6 @@ const ChatInput = ({ onSendMessage, disabled = false, placeholder = 'Type a mess
   };
 
   const handleKeyDown = (e) => {
-    // Send on Enter (but not Shift+Enter for new line)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -59,7 +55,7 @@ const ChatInput = ({ onSendMessage, disabled = false, placeholder = 'Type a mess
           className="send-button"
           title="Send message (Enter)"
         >
-          {disabled ? '⏳' : '📤'}
+          {disabled ? <RiLoader4Line className="spin" /> : <RiSendPlane2Line />}
         </button>
       </div>
       <div className="input-hint">

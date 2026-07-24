@@ -3,6 +3,12 @@ import { chatAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import {
+  RiRobot2Line,
+  RiAddLine,
+  RiCloseLine,
+  RiMessage3Line
+} from 'react-icons/ri';
 import './FloatingChatBot.css';
 
 const FloatingChatBot = () => {
@@ -21,12 +27,10 @@ const FloatingChatBot = () => {
     (user.role !== 'sales' || !!user.is_verified) &&
     !!(user.companyId || user.company_id);
 
-  // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load last conversation when opened
   useEffect(() => {
     if (canUseAssistant && isOpen && !currentConversation) {
       loadLastConversation();
@@ -46,7 +50,6 @@ const FloatingChatBot = () => {
       setUnreadCount(0);
     } catch (err) {
       console.error('Failed to load conversation:', err);
-      // Don't logout user on chat API errors - just show message
       setError('Could not load chat history');
     }
   };
@@ -56,7 +59,6 @@ const FloatingChatBot = () => {
       setError(null);
       setLoading(true);
 
-      // Add user message optimistically
       const userMsg = {
         role: 'user',
         content: message,
@@ -64,16 +66,13 @@ const FloatingChatBot = () => {
       };
       setMessages(prev => [...prev, userMsg]);
 
-      // Send to backend
       const response = await chatAPI.sendMessage(message, currentConversation);
       const { conversationId, aiResponse } = response.data.data;
 
-      // Set current conversation if new
       if (!currentConversation) {
         setCurrentConversation(conversationId);
       }
 
-      // Add AI response
       const assistantMsg = {
         role: 'assistant',
         content: aiResponse,
@@ -109,7 +108,7 @@ const FloatingChatBot = () => {
         }}
         title="Sales Assistant"
       >
-        🤖
+        {isOpen ? <RiCloseLine /> : <RiRobot2Line />}
         {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
       </button>
 
@@ -118,7 +117,10 @@ const FloatingChatBot = () => {
         <div className="floating-chat-widget">
           {/* Header */}
           <div className="widget-header">
-            <h4>Sales Assistant</h4>
+            <div className="widget-header-title">
+              <RiRobot2Line />
+              <h4>Sales Assistant</h4>
+            </div>
             <div className="header-actions">
               {messages.length > 0 && (
                 <button
@@ -126,7 +128,7 @@ const FloatingChatBot = () => {
                   onClick={handleNewChat}
                   title="New chat"
                 >
-                  ➕
+                  <RiAddLine />
                 </button>
               )}
               <button
@@ -134,7 +136,7 @@ const FloatingChatBot = () => {
                 onClick={() => setIsOpen(false)}
                 title="Close"
               >
-                ✕
+                <RiCloseLine />
               </button>
             </div>
           </div>
@@ -142,14 +144,18 @@ const FloatingChatBot = () => {
           {/* Messages */}
           {messages.length === 0 && !error ? (
             <div className="widget-welcome">
-              <div className="welcome-icon">🤖</div>
+              <div className="welcome-icon">
+                <RiMessage3Line />
+              </div>
               <h5>Hi, {user?.name}!</h5>
               <p>Ask me about products, pricing, or sales strategies</p>
             </div>
           ) : (
             <div className="widget-messages">
               {error && (
-                <div className="error-msg">⚠️ {error}</div>
+                <div className="error-msg">
+                  {error}
+                </div>
               )}
               {messages.map((msg, idx) => (
                 <ChatMessage

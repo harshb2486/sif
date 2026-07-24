@@ -3,6 +3,17 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import {
+  RiBarChartBoxLine,
+  RiUserLine,
+  RiMailLine,
+  RiBuildingLine,
+  RiLockLine,
+  RiLockPasswordLine,
+  RiBuilding4Line,
+  RiAlertLine,
+  RiCheckLine
+} from 'react-icons/ri';
 import './Auth.css';
 
 export const RegisterPage = () => {
@@ -91,36 +102,35 @@ export const RegisterPage = () => {
         <div className="auth-header">
           <div className="auth-logo-wrapper">
             <div className="auth-logo" aria-hidden="true">
-              📊
+              <RiBarChartBoxLine />
             </div>
           </div>
           <h1 className="auth-title">Create an Account</h1>
           <p className="auth-subtitle">Join our Field Sales CRM platform</p>
         </div>
 
-        {/* Error/Success Alerts */}
+        {/* Alerts */}
         {error && (
           <div className="auth-alert error">
-            <span className="auth-alert-icon">⚠️</span>
+            <RiAlertLine className="auth-alert-icon" />
             <div className="auth-alert-content">{error}</div>
           </div>
         )}
-
         {success && (
           <div className="auth-alert success">
-            <span className="auth-alert-icon">✅</span>
+            <RiCheckLine className="auth-alert-icon" />
             <div className="auth-alert-content">{success}</div>
           </div>
         )}
 
-        {/* Account Type Tabs */}
+        {/* Tabs */}
         <div className="auth-tabs">
           <button
             className={`auth-tab ${tab === 'company' ? 'active' : ''}`}
             onClick={() => setTab('company')}
             type="button"
           >
-            <span className="tab-icon">🏢</span>
+            <span className="tab-icon"><RiBuilding4Line /></span>
             <span className="tab-label">Company Admin</span>
             <span className="tab-desc">Register your company</span>
           </button>
@@ -129,7 +139,7 @@ export const RegisterPage = () => {
             onClick={() => setTab('sales')}
             type="button"
           >
-            <span className="tab-icon">👤</span>
+            <span className="tab-icon"><RiUserLine /></span>
             <span className="tab-label">Sales Person</span>
             <span className="tab-desc">Join as sales executive</span>
           </button>
@@ -140,12 +150,12 @@ export const RegisterPage = () => {
           <form className="auth-form" onSubmit={handleCompanySubmit}>
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Personal Information</h3>
-              
+
               <div className="auth-form-row">
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-name">Your Full Name</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">👤</span>
+                    <RiUserLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-name"
                       type="text"
@@ -163,7 +173,7 @@ export const RegisterPage = () => {
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-email">Your Email</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">✉️</span>
+                    <RiMailLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-email"
                       type="email"
@@ -182,12 +192,12 @@ export const RegisterPage = () => {
 
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Company Details</h3>
-              
+
               <div className="auth-form-row">
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-name-field">Company Name</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">🏢</span>
+                    <RiBuildingLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-name-field"
                       type="text"
@@ -204,7 +214,7 @@ export const RegisterPage = () => {
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-email-field">Company Email</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">📧</span>
+                    <RiMailLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-email-field"
                       type="email"
@@ -222,12 +232,12 @@ export const RegisterPage = () => {
 
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Security</h3>
-              
+
               <div className="auth-form-row">
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-password">Password</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">🔒</span>
+                    <RiLockLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-password"
                       type="password"
@@ -245,7 +255,7 @@ export const RegisterPage = () => {
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="company-confirm-password">Confirm Password</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">🔐</span>
+                    <RiLockPasswordLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="company-confirm-password"
                       type="password"
@@ -261,11 +271,7 @@ export const RegisterPage = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="auth-submit-btn"
-              disabled={loading}
-            >
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? (
                 <>
                   <span className="spinner"></span>
@@ -283,11 +289,11 @@ export const RegisterPage = () => {
           <form className="auth-form" onSubmit={handleSalesSubmit}>
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Personal Information</h3>
-              
+
               <div className="auth-form-group">
                 <label className="auth-label" htmlFor="sales-name">Your Full Name</label>
                 <div className="auth-input-wrapper">
-                  <span className="auth-input-icon" aria-hidden="true">👤</span>
+                  <RiUserLine className="auth-input-icon" aria-hidden="true" />
                   <input
                     id="sales-name"
                     type="text"
@@ -305,7 +311,7 @@ export const RegisterPage = () => {
               <div className="auth-form-group">
                 <label className="auth-label" htmlFor="sales-email">Email Address</label>
                 <div className="auth-input-wrapper">
-                  <span className="auth-input-icon" aria-hidden="true">✉️</span>
+                  <RiMailLine className="auth-input-icon" aria-hidden="true" />
                   <input
                     id="sales-email"
                     type="email"
@@ -323,11 +329,11 @@ export const RegisterPage = () => {
 
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Company Preference (Optional)</h3>
-              
+
               <div className="auth-form-group">
                 <label className="auth-label" htmlFor="sales-company">Preferred Company ID</label>
                 <div className="auth-input-wrapper">
-                  <span className="auth-input-icon" aria-hidden="true">🏢</span>
+                  <RiBuildingLine className="auth-input-icon" aria-hidden="true" />
                   <input
                     id="sales-company"
                     type="text"
@@ -344,12 +350,12 @@ export const RegisterPage = () => {
 
             <div className="auth-form-section">
               <h3 className="auth-form-section-title">Security</h3>
-              
+
               <div className="auth-form-row">
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="sales-password">Password</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">🔒</span>
+                    <RiLockLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="sales-password"
                       type="password"
@@ -367,7 +373,7 @@ export const RegisterPage = () => {
                 <div className="auth-form-group">
                   <label className="auth-label" htmlFor="sales-confirm-password">Confirm Password</label>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon" aria-hidden="true">🔐</span>
+                    <RiLockPasswordLine className="auth-input-icon" aria-hidden="true" />
                     <input
                       id="sales-confirm-password"
                       type="password"
@@ -383,11 +389,7 @@ export const RegisterPage = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="auth-submit-btn"
-              disabled={loading}
-            >
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? (
                 <>
                   <span className="spinner"></span>

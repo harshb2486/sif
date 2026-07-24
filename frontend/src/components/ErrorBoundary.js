@@ -2,20 +2,11 @@
 // Catches React component errors and prevents app crash
 
 import React from 'react';
+import { RiAlertLine } from 'react-icons/ri';
 import './ErrorBoundary.css';
 
-interface Props {
-  children: React.ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: React.ErrorInfo | null;
-}
-
-export class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
       hasError: false,
@@ -24,20 +15,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error) {
     return { hasError: true, error, errorInfo: null };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo
     });
-
-    // Log error to external service (e.g., Sentry, LogRocket)
-    // logErrorToService(error, errorInfo);
   }
 
   handleReset = () => {
@@ -53,9 +41,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="error-boundary-container">
           <div className="error-boundary-content">
-            <h1>⚠️ Oops! Something went wrong</h1>
+            <h1><RiAlertLine /> Oops! Something went wrong</h1>
             <p>We're sorry, but something unexpected happened. The application will try to recover.</p>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="error-details">
                 <summary>Error Details (Development Only)</summary>
@@ -66,11 +54,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 </pre>
               </details>
             )}
-            
+
             <button onClick={this.handleReset} className="btn btn-primary">
               Try Again
             </button>
-            
+
             <button onClick={() => window.location.href = '/dashboard'} className="btn btn-secondary">
               Go to Dashboard
             </button>

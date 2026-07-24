@@ -4,6 +4,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
+import {
+  RiBarChartBoxLine,
+  RiMailLine,
+  RiLockLine,
+  RiEyeLine,
+  RiEyeOffLine,
+  RiAlertLine,
+  RiGoogleFill,
+  RiFacebookFill
+} from 'react-icons/ri';
 import './Auth.css';
 
 export const LoginPage = () => {
@@ -25,7 +35,7 @@ export const LoginPage = () => {
       const { token, user } = response.data.data;
 
       login(user, token);
-      
+
       if (user.role === 'sales' && !user.is_verified) {
         navigate('/waiting-approval');
       } else {
@@ -45,7 +55,7 @@ export const LoginPage = () => {
         <div className="auth-header">
           <div className="auth-logo-wrapper">
             <div className="auth-logo" aria-hidden="true">
-              📊
+              <RiBarChartBoxLine />
             </div>
           </div>
           <h1 className="auth-title">Welcome Back</h1>
@@ -55,7 +65,7 @@ export const LoginPage = () => {
         {/* Error Alert */}
         {error && (
           <div className="auth-alert error">
-            <span className="auth-alert-icon">⚠️</span>
+            <RiAlertLine className="auth-alert-icon" />
             <div className="auth-alert-content">{error}</div>
           </div>
         )}
@@ -66,7 +76,7 @@ export const LoginPage = () => {
           <div className="auth-form-group">
             <label className="auth-label" htmlFor="email">Email Address</label>
             <div className="auth-input-wrapper">
-              <span className="auth-input-icon" aria-hidden="true">✉️</span>
+              <RiMailLine className="auth-input-icon" aria-hidden="true" />
               <input
                 id="email"
                 type="email"
@@ -84,7 +94,7 @@ export const LoginPage = () => {
           <div className="auth-form-group">
             <label className="auth-label" htmlFor="password">Password</label>
             <div className="auth-input-wrapper">
-              <span className="auth-input-icon" aria-hidden="true">🔒</span>
+              <RiLockLine className="auth-input-icon" aria-hidden="true" />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -101,7 +111,7 @@ export const LoginPage = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? <RiEyeOffLine /> : <RiEyeLine />}
               </button>
             </div>
           </div>
@@ -142,11 +152,11 @@ export const LoginPage = () => {
         {/* Social Login */}
         <div className="auth-social-buttons">
           <button type="button" className="auth-social-btn">
-            <span aria-hidden="true">G</span>
+            <RiGoogleFill />
             Google
           </button>
           <button type="button" className="auth-social-btn">
-            <span aria-hidden="true">f</span>
+            <RiFacebookFill />
             Facebook
           </button>
         </div>

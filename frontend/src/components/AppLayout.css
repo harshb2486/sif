@@ -1,0 +1,46 @@
+/* AppLayout.css - Shared shell for authenticated pages */
+
+@import '../styles/variables.css';
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+.app-layout-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  min-width: 0;
+  transition: margin-left var(--transition-normal);
+}
+
+.app-layout-main {
+  flex: 1;
+  padding-top: var(--header-height);
+  min-height: 100vh;
+}
+
+.app-layout-content {
+  padding: 24px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+@media (max-width: 1023px) {
+  .app-layout-body {
+    margin-left: 0;
+  }
+
+  .app-layout-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-layout-content {
+    padding: 16px 12px;
+  }
+}

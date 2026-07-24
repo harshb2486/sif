@@ -1,4 +1,5 @@
 import React from 'react';
+import { RiUserLine, RiRobot2Line } from 'react-icons/ri';
 import './ChatMessage.css';
 
 const ChatMessage = ({ role, content, timestamp }) => {
@@ -8,7 +9,6 @@ const ChatMessage = ({ role, content, timestamp }) => {
   };
 
   const formatContent = (text) => {
-    // Convert markdown-like formatting to JSX
     return text.split('\n').map((line, idx) => (
       <div key={idx} className="message-line">
         {line.startsWith('- ') ? (
@@ -26,7 +26,7 @@ const ChatMessage = ({ role, content, timestamp }) => {
     <div className={`message-row ${role}`}>
       <div className={`message ${role}-message`}>
         <div className="message-avatar">
-          {role === 'user' ? '👤' : '🤖'}
+          {role === 'user' ? <RiUserLine /> : <RiRobot2Line />}
         </div>
         <div className="message-content">
           {formatContent(content)}

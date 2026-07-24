@@ -3,6 +3,18 @@ import { chatAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import {
+  RiRobot2Line,
+  RiAddLine,
+  RiSearchLine,
+  RiDeleteBinLine,
+  RiCloseLine,
+  RiBarChartBoxLine,
+  RiCoinsLine,
+  RiFocus3Line,
+  RiRocketLine,
+  RiAlertLine
+} from 'react-icons/ri';
 import './ChatBot.css';
 
 const ChatBot = () => {
@@ -13,20 +25,16 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load conversations on mount
   useEffect(() => {
     loadConversations();
   }, []);
 
-  // Load messages when conversation changes
   useEffect(() => {
     if (currentConversation) {
       loadConversationMessages(currentConversation);
@@ -61,7 +69,6 @@ const ChatBot = () => {
       setError(null);
       setLoading(true);
 
-      // Add user message optimistically
       const userMsg = {
         role: 'user',
         content: message,
@@ -69,16 +76,13 @@ const ChatBot = () => {
       };
       setMessages(prev => [...prev, userMsg]);
 
-      // Send to backend
       const response = await chatAPI.sendMessage(message, currentConversation);
       const { conversationId, aiResponse, metadata } = response.data.data;
 
-      // Set current conversation if new
       if (!currentConversation) {
         setCurrentConversation(conversationId);
       }
 
-      // Add AI response
       const assistantMsg = {
         role: 'assistant',
         content: aiResponse,
@@ -87,11 +91,9 @@ const ChatBot = () => {
       };
       setMessages(prev => [...prev, assistantMsg]);
 
-      // Refresh conversations list
       loadConversations();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send message');
-      // Remove the optimistic user message on error
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setLoading(false);
@@ -102,7 +104,7 @@ const ChatBot = () => {
     setCurrentConversation(null);
     setMessages([]);
     setSearchQuery('');
-    setShowSearch(false);
+    setError(null);
   };
 
   const handleDeleteConversation = async (conversationId) => {
@@ -120,7 +122,10 @@ const ChatBot = () => {
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim()) {
+      loadConversations();
+      return;
+    }
 
     try {
       setLoading(true);
@@ -133,20 +138,26 @@ const ChatBot = () => {
     }
   };
 
+  const features = [
+    { icon: RiBarChartBoxLine, title: 'Product Information', description: 'Get details about your products and pricing' },
+    { icon: RiCoinsLine, title: 'Commission Calculations', description: 'Understand your earnings and bonuses' },
+    { icon: RiFocus3Line, title: 'Sales Strategies', description: 'Get expert tips and sales techniques' },
+    { icon: RiRocketLine, title: 'Performance Insights', description: 'Analyze your sales data and performance' }
+  ];
+
   return (
     <div className="chatbot-container">
       {/* Sidebar */}
       <div className="chatbot-sidebar">
         <div className="sidebar-header">
+          <RiRobot2Line />
           <h3>Sales Assistant</h3>
         </div>
 
-        {/* New Chat Button */}
         <button className="new-chat-btn" onClick={handleNewConversation}>
-          ➕ New Chat
+          <RiAddLine /> New Chat
         </button>
 
-        {/* Search */}
         <div className="search-container">
           <input
             type="text"
@@ -156,10 +167,9 @@ const ChatBot = () => {
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             className="search-input"
           />
-          <button onClick={handleSearch} className="search-btn">🔍</button>
+          <button onClick={handleSearch} className="search-btn"><RiSearchLine /></button>
         </div>
 
-        {/* Conversations List */}
         <div className="conversations-list">
           {conversations.length === 0 ? (
             <p className="empty-message">No conversations yet</p>
@@ -169,22 +179,24 @@ const ChatBot = () => {
                 key={conv.conversation_id}
                 className={`conversation-item ${currentConversation === conv.conversation_id ? 'active' : ''}`}
               >
-                <div
-                  className="conv-title"
-                  onClick={() => setCurrentConversation(conv.conversation_id)}
-                  title={conv.title}
-                >
-                  {conv.title}
-                </div>
-                <div className="conv-meta">
-                  {conv.total_messages} msgs • {conv.total_tokens} tokens
+                <div className="conversation-item-main">
+                  <div
+                    className="conv-title"
+                    onClick={() => setCurrentConversation(conv.conversation_id)}
+                    title={conv.title}
+                  >
+                    {conv.title}
+                  </div>
+                  <div className="conv-meta">
+                    {conv.total_messages} msgs • {conv.total_tokens} tokens
+                  </div>
                 </div>
                 <button
                   className="delete-btn"
                   onClick={() => handleDeleteConversation(conv.conversation_id)}
                   title="Delete conversation"
                 >
-                  🗑️
+                  <RiDeleteBinLine />
                 </button>
               </div>
             ))
@@ -197,37 +209,24 @@ const ChatBot = () => {
         {!currentConversation && messages.length === 0 ? (
           <div className="welcome-container">
             <div className="welcome-content">
-              <h2>Welcome, {user?.name}! 👋</h2>
+              <div className="welcome-icon">
+                <RiRobot2Line />
+              </div>
+              <h2>Welcome, {user?.name}!</h2>
               <p className="welcome-subtitle">Your Sales Assistant</p>
               <div className="feature-list">
-                <div className="feature">
-                  <span className="icon">📊</span>
-                  <div>
-                    <h4>Product Information</h4>
-                    <p>Get details about your products and pricing</p>
-                  </div>
-                </div>
-                <div className="feature">
-                  <span className="icon">💰</span>
-                  <div>
-                    <h4>Commission Calculations</h4>
-                    <p>Understand your earnings and bonuses</p>
-                  </div>
-                </div>
-                <div className="feature">
-                  <span className="icon">🎯</span>
-                  <div>
-                    <h4>Sales Strategies</h4>
-                    <p>Get expert tips and sales techniques</p>
-                  </div>
-                </div>
-                <div className="feature">
-                  <span className="icon">🚀</span>
-                  <div>
-                    <h4>Performance Insights</h4>
-                    <p>Analyze your sales data and performance</p>
-                  </div>
-                </div>
+                {features.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div className="feature" key={feature.title}>
+                      <span className="icon"><Icon /></span>
+                      <div>
+                        <h4>{feature.title}</h4>
+                        <p>{feature.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               <p className="welcome-hint">Start a conversation by typing a message below</p>
             </div>
@@ -236,7 +235,7 @@ const ChatBot = () => {
           <div className="messages-container">
             {error && (
               <div className="error-banner">
-                ⚠️ {error}
+                <RiAlertLine /> {error}
               </div>
             )}
 
@@ -267,7 +266,6 @@ const ChatBot = () => {
           </div>
         )}
 
-        {/* Chat Input */}
         <ChatInput
           onSendMessage={handleSendMessage}
           disabled={loading}

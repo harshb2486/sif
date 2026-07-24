@@ -1,40 +1,52 @@
 /* Error Boundary Styles */
 
+@import '../styles/variables.css';
+
 .error-boundary-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #f5f3ff 100%);
   padding: 20px;
 }
 
 .error-boundary-content {
   background: white;
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 40px;
-  max-width: 500px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 520px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
   text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 .error-boundary-content h1 {
-  color: #d32f2f;
+  color: var(--error);
   margin: 0 0 16px 0;
-  font-size: 28px;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.error-boundary-content h1 svg {
+  font-size: 32px;
 }
 
 .error-boundary-content p {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0 0 24px 0;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.6;
 }
 
 .error-details {
-  background: #f5f5f5;
-  border-left: 4px solid #d32f2f;
-  border-radius: 4px;
+  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--error);
+  border-radius: 10px;
   padding: 16px;
   margin: 20px 0;
   text-align: left;
@@ -43,58 +55,59 @@
 .error-details summary {
   cursor: pointer;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   user-select: none;
 }
 
 .error-details summary:hover {
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .error-stack {
-  background: #222;
-  color: #0f0;
-  padding: 12px;
-  border-radius: 4px;
+  background: #111827;
+  color: #22c55e;
+  padding: 14px;
+  border-radius: 8px;
   overflow-x: auto;
   font-size: 12px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   margin: 12px 0 0 0;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .error-boundary-content .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px 24px;
   margin: 8px;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
-.btn-primary {
-  background: #667eea;
+.error-boundary-content .btn-primary {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
   color: white;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 }
 
-.btn-primary:hover {
-  background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+.error-boundary-content .btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-dark), #1d4ed8);
+  transform: translateY(-1px);
 }
 
-.btn-secondary {
-  background: #e0e0e0;
-  color: #333;
+.error-boundary-content .btn-secondary {
+  background: #f3f4f6;
+  color: var(--text-primary);
 }
 
-.btn-secondary:hover {
-  background: #d0d0d0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.error-boundary-content .btn-secondary:hover {
+  background: #e5e7eb;
 }
 
 @media (max-width: 600px) {

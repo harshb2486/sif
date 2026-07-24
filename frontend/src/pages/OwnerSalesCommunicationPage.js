@@ -1,8 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Header, Sidebar } from '../components';
 import { useAuth } from '../context/AuthContext';
 import { ownerSalesChatAPI } from '../services/api';
 import { connectRealtimeSocket, disconnectRealtimeSocket, getRealtimeSocket } from '../services/realtimeSocket';
+import {
+  RiPhoneLine,
+  RiVideoChatLine,
+  RiCloseLine,
+  RiSendPlane2Line,
+  RiUserLine,
+  RiAlertLine,
+  RiRadioButtonLine
+} from 'react-icons/ri';
 import './Pages.css';
 
 const rtcConfig = {
@@ -367,110 +375,127 @@ export const OwnerSalesCommunicationPage = () => {
   }, [user?.role]);
 
   return (
-    <div className="page-layout">
-      <Sidebar />
-      <main className="main-content">
-        <Header />
-        <div className="page-container owner-sales-comm-page">
-          <div className="page-header">
-            <h1>📞 Team Communication</h1>
-            <p className="page-subtitle">Realtime chat and calling between owner and sales team</p>
+    <div className="page-container owner-sales-comm-page">
+      <div className="page-header">
+        <h1 className="page-title">
+          <RiPhoneLine />
+          Team Communication
+        </h1>
+        <p className="page-subtitle">Realtime chat and calling between owner and sales team</p>
+      </div>
+
+      {error && <div className="alert alert-error"><RiAlertLine /> {error}</div>}
+
+      {incomingCall && (
+        <div className="owner-sales-incoming-call">
+          <p>
+            Incoming {incomingCall.callType} call from <strong>{incomingCall.fromUserName}</strong>
+          </p>
+          <div>
+            <button className="btn btn-primary btn-sm" onClick={acceptIncomingCall}>
+              <RiPhoneLine /> Accept
+            </button>
+            <button className="btn btn-sm btn-delete" onClick={rejectIncomingCall}>
+              <RiCloseLine /> Reject
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="owner-sales-layout">
+        <aside className="owner-sales-contacts">
+          <h3>Contacts</h3>
+          <p className="owner-sales-help">{contactSummary}</p>
+
+          {contacts.length === 0 ? (
+            <p className="owner-sales-empty">No contacts available.</p>
+          ) : (
+            contacts.map((contact) => (
+              <button
+                key={contact.id}
+                className={`owner-sales-contact ${selectedContactId === contact.id ? 'active' : ''}`}
+                onClick={() => setSelectedContact(contact)}
+              >
+                <div className="owner-sales-contact-info">
+                  <div className="owner-sales-contact-avatar">
+                    <RiUserLine />
+                  </div>
+                  <div>
+                    <strong>{contact.name}</strong>
+                    <p>{contact.email}</p>
+                  </div>
+                </div>
+                <span className={`presence-dot ${isContactOnline(contact.id) ? 'online' : 'offline'}`} title={isContactOnline(contact.id) ? 'Online' : 'Offline'} />
+              </button>
+            ))
+          )}
+        </aside>
+
+        <section className="owner-sales-chat-panel">
+          <div className="owner-sales-chat-header">
+            <div className="owner-sales-chat-header-info">
+              <div className="owner-sales-contact-avatar">
+                <RiUserLine />
+              </div>
+              <div>
+                <h3>{selectedContact?.name || 'Select a contact'}</h3>
+                <p>{selectedContact ? (isContactOnline(selectedContact.id) ? <><RiRadioButtonLine className="online-indicator" /> Online</> : 'Offline') : 'No contact selected'}</p>
+              </div>
+            </div>
+
+            {selectedContact && (
+              <div className="owner-sales-call-actions">
+                <button className="btn btn-sm btn-secondary" onClick={() => startCall('audio')}>
+                  <RiPhoneLine /> Audio
+                </button>
+                <button className="btn btn-sm btn-secondary" onClick={() => startCall('video')}>
+                  <RiVideoChatLine /> Video
+                </button>
+                {activeCall && <button className="btn btn-sm btn-delete" onClick={endCall}><RiCloseLine /> End</button>}
+              </div>
+            )}
           </div>
 
-          {error && <div className="alert alert-error">{error}</div>}
+          <div className="owner-sales-messages">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`owner-sales-message ${Number(msg.sender_id) === Number(user?.id) ? 'mine' : 'theirs'}`}
+              >
+                <p>{msg.content}</p>
+                <span>{new Date(msg.created_at).toLocaleTimeString()}</span>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
 
-          {incomingCall && (
-            <div className="owner-sales-incoming-call">
-              <p>
-                Incoming {incomingCall.callType} call from <strong>{incomingCall.fromUserName}</strong>
-              </p>
-              <div>
-                <button className="btn btn-primary btn-sm" onClick={acceptIncomingCall}>Accept</button>
-                <button className="btn btn-sm btn-delete" onClick={rejectIncomingCall}>Reject</button>
+          <div className="owner-sales-input-row">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Type your message..."
+              disabled={!selectedContact}
+            />
+            <button className="btn btn-primary" onClick={handleSendMessage} disabled={!selectedContact}>
+              <RiSendPlane2Line /> Send
+            </button>
+          </div>
+
+          {activeCall && (
+            <div className="owner-sales-call-area">
+              <h4>
+                {activeCall.callType === 'video' ? 'Video Call' : 'Audio Call'} with {activeCall.targetUserName}
+              </h4>
+              <div className="owner-sales-videos">
+                <video ref={remoteVideoRef} autoPlay playsInline className="remote-video" />
+                <video ref={localVideoRef} autoPlay muted playsInline className="local-video" />
               </div>
             </div>
           )}
-
-          <div className="owner-sales-layout">
-            <aside className="owner-sales-contacts">
-              <h3>Contacts</h3>
-              <p className="owner-sales-help">{contactSummary}</p>
-
-              {contacts.length === 0 ? (
-                <p className="owner-sales-empty">No contacts available.</p>
-              ) : (
-                contacts.map((contact) => (
-                  <button
-                    key={contact.id}
-                    className={`owner-sales-contact ${selectedContactId === contact.id ? 'active' : ''}`}
-                    onClick={() => setSelectedContact(contact)}
-                  >
-                    <div>
-                      <strong>{contact.name}</strong>
-                      <p>{contact.email}</p>
-                    </div>
-                    <span className={`presence-dot ${isContactOnline(contact.id) ? 'online' : 'offline'}`} />
-                  </button>
-                ))
-              )}
-            </aside>
-
-            <section className="owner-sales-chat-panel">
-              <div className="owner-sales-chat-header">
-                <div>
-                  <h3>{selectedContact?.name || 'Select a contact'}</h3>
-                  <p>{selectedContact ? (isContactOnline(selectedContact.id) ? 'Online' : 'Offline') : 'No contact selected'}</p>
-                </div>
-
-                {selectedContact && (
-                  <div className="owner-sales-call-actions">
-                    <button className="btn btn-sm" onClick={() => startCall('audio')}>📞 Audio</button>
-                    <button className="btn btn-sm" onClick={() => startCall('video')}>🎥 Video</button>
-                    {activeCall && <button className="btn btn-sm btn-delete" onClick={endCall}>End</button>}
-                  </div>
-                )}
-              </div>
-
-              <div className="owner-sales-messages">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`owner-sales-message ${Number(msg.sender_id) === Number(user?.id) ? 'mine' : 'theirs'}`}
-                  >
-                    <p>{msg.content}</p>
-                    <span>{new Date(msg.created_at).toLocaleTimeString()}</span>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="owner-sales-input-row">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Type your message..."
-                  disabled={!selectedContact}
-                />
-                <button className="btn btn-primary" onClick={handleSendMessage} disabled={!selectedContact}>Send</button>
-              </div>
-
-              {activeCall && (
-                <div className="owner-sales-call-area">
-                  <h4>
-                    {activeCall.callType === 'video' ? 'Video Call' : 'Audio Call'} with {activeCall.targetUserName}
-                  </h4>
-                  <div className="owner-sales-videos">
-                    <video ref={remoteVideoRef} autoPlay playsInline className="remote-video" />
-                    <video ref={localVideoRef} autoPlay muted playsInline className="local-video" />
-                  </div>
-                </div>
-              )}
-            </section>
-          </div>
-        </div>
-      </main>
+        </section>
+      </div>
     </div>
   );
 };
