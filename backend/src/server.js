@@ -8,7 +8,9 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const xss = require('xss-clean');
-require('dotenv').config();
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../../.env')
+});
 
 // Import utilities
 const logger = require('./utils/logger');
@@ -102,7 +104,9 @@ const server = httpServer.listen(PORT, () => {
   console.log(`\n╔════════════════════════════════════════╗`);
   console.log(`║ Field Sales Management API Server      ║`);
   console.log(`║ Running on: http://localhost:${PORT}      ║`);
-  console.log(`║ Environment: ${process.env.NODE_ENV.toUpperCase().padEnd(22)}║`);
+ const env = (process.env.NODE_ENV || "development").toUpperCase();
+
+console.log(`║ Environment: ${env.padEnd(22)}║`);
   console.log(`╚════════════════════════════════════════╝\n`);
 });
 
